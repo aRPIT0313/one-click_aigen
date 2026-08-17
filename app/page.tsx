@@ -445,35 +445,46 @@ export default function Home() {
   // VOICE PREVIEW
   // ===================================================
 
-  const previewVoice = () => {
+  const [previewingVoice, setPreviewingVoice] =
+  useState(false);
 
-    if (
-      typeof window === "undefined" ||
-      !window.speechSynthesis
-    ) {
-      return;
-    }
+const previewVoice = () => {
+  if (typeof window === "undefined") {
+    return;
+  }
 
-    window.speechSynthesis.cancel();
+  const voiceFile =
+    `/voice-previews/${voice.toLowerCase()}.wav`;
 
-    const text =
-      language === "Hindi"
-        ? "नमस्ते! आप कैसे हैं? आज हम कुछ बहुत दिलचस्प जानने वाले हैं।"
-        : language === "Hinglish"
-          ? "Hi! How are you? Aaj hum kuch bahut interesting jaanne wale hain."
-          : "Hi! How are you? Today we're going to discover something really interesting.";
+  const audio =
+    new Audio(voiceFile);
 
-    const utterance =
-      new SpeechSynthesisUtterance(text);
+  audio.preload = "auto";
 
-    utterance.rate = 0.95;
+  setPreviewingVoice(true);
 
-    window.speechSynthesis.speak(
-      utterance
-    );
-
+  audio.onended = () => {
+    setPreviewingVoice(false);
   };
 
+  audio.onerror = () => {
+    setPreviewingVoice(false);
+
+    setError(
+      `Could not load the ${voice} voice preview.`
+    );
+  };
+
+  audio.play().catch((error) => {
+    console.error(error);
+
+    setPreviewingVoice(false);
+
+    setError(
+      "Could not play the voice preview."
+    );
+  });
+};
 
   // ===================================================
   // CREATE VOICE
@@ -1314,22 +1325,23 @@ export default function Home() {
 
 
                   <button
-
-                    type="button"
-
-                    onClick={
-                      previewVoice
-                    }
-
-                    className="flex shrink-0 items-center gap-2 rounded-xl border border-white/10 bg-white/[0.035] px-4 text-xs text-gray-300 transition hover:border-white/20 hover:bg-white/[0.07] hover:text-white"
-
-                  >
-
-                    <PlayIcon />
-
-                    Preview
-
-                  </button>
+  type="button"
+  onClick={previewVoice}
+  disabled={previewingVoice}
+  className="flex shrink-0 items-center gap-2 rounded-xl border border-white/10 bg-white/[0.035] px-4 text-xs text-gray-300 transition hover:border-white/20 hover:bg-white/[0.07] hover:text-white disabled:cursor-not-allowed disabled:opacity-50"
+>
+  {previewingVoice ? (
+    <>
+      <span className="h-3.5 w-3.5 animate-spin rounded-full border border-white/20 border-t-white" />
+      Playing
+    </>
+  ) : (
+    <>
+      <PlayIcon />
+      Preview
+    </>
+  )}
+</button>
 
                 </div>
 
