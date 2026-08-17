@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useState } from "react";
 
 import {
   generateShort,
@@ -70,7 +70,7 @@ function SparklesIcon() {
       className="h-5 w-5"
     >
       <path d="m12 3-1.2 4.1L7 8.5l3.8 1.4L12 14l1.2-4.1L17 8.5l-3.8-1.4L12 3Z" />
-      <path d="m19 13-.7 2.3-2.3.7 2.3.7.7 2.3 2.3-.7-2.3-.7L19 13Z" />
+      <path d="m19 13-.7 2.3-2.3.7.2.7 2.3-.7.7-2.3.7 2.3 2.3.7-2.3.7-.7 2.3-.7-2.3-2.3-.7 2.3-.7.7Z" />
     </svg>
   );
 }
@@ -147,197 +147,21 @@ function VideoIcon() {
   );
 }
 
-function CopyIcon() {
-  return (
-    <svg
-      viewBox="0 0 24 24"
-      fill="none"
-      stroke="currentColor"
-      strokeWidth="1.8"
-      className="h-3.5 w-3.5"
-    >
-      <rect x="8" y="8" width="11" height="11" rx="2" />
-      <path d="M16 8V6a2 2 0 0 0-2-2H6a2 2 0 0 0-2 2v8a2 2 0 0 0 2 2h2" />
-    </svg>
-  );
-}
-
-function MailIcon() {
-  return (
-    <svg
-      viewBox="0 0 24 24"
-      fill="none"
-      stroke="currentColor"
-      strokeWidth="1.8"
-      className="h-4 w-4"
-    >
-      <rect x="3" y="5" width="18" height="14" rx="2" />
-      <path d="m3 7 9 6 9-6" />
-    </svg>
-  );
-}
-
-function ChevronIcon({
-  open,
-}: {
-  open: boolean;
-}) {
-  return (
-    <svg
-      viewBox="0 0 24 24"
-      fill="none"
-      stroke="currentColor"
-      strokeWidth="2"
-      className={`h-4 w-4 transition-transform ${
-        open ? "rotate-180" : ""
-      }`}
-    >
-      <path d="m6 9 6 6 6-6" />
-    </svg>
-  );
-}
-
 
 // =====================================================
-// BYTE -> BLOB
-//
-// Creates a real ArrayBuffer-backed copy.
-// This avoids the TypeScript ArrayBufferLike
-// compatibility problem.
+// AUDIO BLOB HELPER
 // =====================================================
 
 function bytesToBlob(
   bytes: Uint8Array,
   type: string
 ): Blob {
-
-  const copy =
-    new Uint8Array(
-      bytes.byteLength
-    );
-
+  const copy = new Uint8Array(bytes.byteLength);
   copy.set(bytes);
 
   return new Blob(
     [copy.buffer],
-    {
-      type,
-    }
-  );
-}
-
-
-// =====================================================
-// COPY BUTTON
-// =====================================================
-
-function CopyButton({
-  value,
-  label = "Copy",
-}: {
-  value: string;
-  label?: string;
-}) {
-
-  const [copied, setCopied] =
-    useState(false);
-
-  const handleCopy = async () => {
-
-    if (!value) {
-      return;
-    }
-
-    try {
-
-      await navigator.clipboard.writeText(
-        value
-      );
-
-      setCopied(true);
-
-      window.setTimeout(() => {
-        setCopied(false);
-      }, 1500);
-
-    } catch {
-
-      // Fallback for browsers where
-      // clipboard API is unavailable.
-
-      try {
-
-        const textarea =
-          document.createElement(
-            "textarea"
-          );
-
-        textarea.value = value;
-
-        textarea.style.position =
-          "fixed";
-
-        textarea.style.opacity =
-          "0";
-
-        document.body.appendChild(
-          textarea
-        );
-
-        textarea.focus();
-
-        textarea.select();
-
-        document.execCommand(
-          "copy"
-        );
-
-        document.body.removeChild(
-          textarea
-        );
-
-        setCopied(true);
-
-        window.setTimeout(() => {
-          setCopied(false);
-        }, 1500);
-
-      } catch (error) {
-
-        console.error(
-          "Copy failed:",
-          error
-        );
-
-      }
-
-    }
-
-  };
-
-  return (
-
-    <button
-      type="button"
-      onClick={handleCopy}
-      disabled={!value}
-      className="flex items-center gap-1.5 rounded-lg border border-white/10 bg-white/[0.035] px-2.5 py-1.5 text-[10px] text-gray-500 transition hover:border-white/20 hover:bg-white/[0.07] hover:text-white disabled:cursor-not-allowed disabled:opacity-30"
-    >
-
-      {copied ? (
-        <>
-          <CheckIcon />
-          Copied
-        </>
-      ) : (
-        <>
-          <CopyIcon />
-          {label}
-        </>
-      )}
-
-    </button>
-
+    { type }
   );
 }
 
@@ -347,6 +171,59 @@ function CopyButton({
 // =====================================================
 
 export default function Home() {
+
+  // ===================================================
+  // SEO STRUCTURED DATA
+  // ===================================================
+
+  const siteUrl =
+    "https://one-click-aigen.vercel.app";
+
+  const structuredData = {
+    "@context": "https://schema.org",
+    "@type": "WebApplication",
+
+    name: "AI Shorts",
+
+    alternateName:
+      "One Click AI Gen",
+
+    url: siteUrl,
+
+    description:
+      "Free AI video generator for creating short-form videos with AI scripts, voiceovers, stock footage and automatic 9:16 video rendering.",
+
+    applicationCategory:
+      "MultimediaApplication",
+
+    operatingSystem:
+      "Web",
+
+    browserRequirements:
+      "Requires JavaScript",
+
+    isAccessibleForFree:
+      true,
+
+    offers: {
+      "@type": "Offer",
+      price: "0",
+      priceCurrency: "USD",
+    },
+
+    featureList: [
+      "AI short video generation",
+      "AI script generation",
+      "AI voiceover generation",
+      "Stock video search",
+      "Automatic video rendering",
+      "Vertical 9:16 video generation",
+      "YouTube Shorts creation",
+      "Instagram Reels creation",
+      "TikTok video creation",
+    ],
+  };
+
 
   // ===================================================
   // INPUTS
@@ -363,14 +240,6 @@ export default function Home() {
 
   const [voice, setVoice] =
     useState("Kore");
-
-  const [voiceMenuOpen, setVoiceMenuOpen] =
-    useState(false);
-
-  const voiceMenuRef =
-    useRef<HTMLDivElement | null>(
-      null
-    );
 
 
   // ===================================================
@@ -412,45 +281,19 @@ export default function Home() {
   // ===================================================
 
   const [result, setResult] =
-    useState<GeneratedShort | null>(
-      null
-    );
+    useState<GeneratedShort | null>(null);
 
   const [videos, setVideos] =
-    useState<
-      (PexelsVideo | null)[]
-    >([]);
+    useState<(PexelsVideo | null)[]>([]);
 
   const [audioData, setAudioData] =
-    useState<Uint8Array | null>(
-      null
-    );
+    useState<Uint8Array | null>(null);
 
   const [audioUrl, setAudioUrl] =
-    useState<string | null>(
-      null
-    );
+    useState<string | null>(null);
 
   const [finalVideoUrl, setFinalVideoUrl] =
-    useState<string | null>(
-      null
-    );
-
-
-  // ===================================================
-  // SUGGESTION
-  // ===================================================
-
-  const [suggestion, setSuggestion] =
-    useState("");
-
-  const [suggestionSent, setSuggestionSent] =
-    useState(false);
-
-
-  // ===================================================
-  // ERROR
-  // ===================================================
+    useState<string | null>(null);
 
   const [error, setError] =
     useState("");
@@ -484,52 +327,9 @@ export default function Home() {
 
     } catch (err) {
 
-      console.error(
-        "Unable to load saved settings:",
-        err
-      );
+      console.error(err);
 
     }
-
-  }, []);
-
-
-  // ===================================================
-  // CLOSE VOICE MENU WHEN CLICKING OUTSIDE
-  // ===================================================
-
-  useEffect(() => {
-
-    const handleOutsideClick = (
-      event: MouseEvent
-    ) => {
-
-      if (
-        voiceMenuRef.current &&
-        !voiceMenuRef.current.contains(
-          event.target as Node
-        )
-      ) {
-
-        setVoiceMenuOpen(false);
-
-      }
-
-    };
-
-    document.addEventListener(
-      "mousedown",
-      handleOutsideClick
-    );
-
-    return () => {
-
-      document.removeEventListener(
-        "mousedown",
-        handleOutsideClick
-      );
-
-    };
 
   }, []);
 
@@ -543,15 +343,11 @@ export default function Home() {
     return () => {
 
       if (audioUrl) {
-        URL.revokeObjectURL(
-          audioUrl
-        );
+        URL.revokeObjectURL(audioUrl);
       }
 
       if (finalVideoUrl) {
-        URL.revokeObjectURL(
-          finalVideoUrl
-        );
+        URL.revokeObjectURL(finalVideoUrl);
       }
 
     };
@@ -563,8 +359,7 @@ export default function Home() {
 
 
   const keysMissing =
-    !geminiKey ||
-    !pexelsKey;
+    !geminiKey || !pexelsKey;
 
 
   // ===================================================
@@ -612,7 +407,6 @@ export default function Home() {
       }
 
       setGeminiKey(gemini);
-
       setPexelsKey(pexels);
 
       setShowSettings(false);
@@ -634,121 +428,46 @@ export default function Home() {
 
   const removeKeys = () => {
 
-    try {
+    localStorage.removeItem(
+      "gemini_api_key"
+    );
 
-      localStorage.removeItem(
-        "gemini_api_key"
-      );
+    localStorage.removeItem(
+      "pexels_api_key"
+    );
 
-      localStorage.removeItem(
-        "pexels_api_key"
-      );
-
-      setGeminiKey("");
-
-      setPexelsKey("");
-
-    } catch (err) {
-
-      console.error(err);
-
-    }
+    setGeminiKey("");
+    setPexelsKey("");
 
   };
 
 
   // ===================================================
   // VOICE PREVIEW
-  //
-  // IMPORTANT:
-  // This NEVER calls Gemini.
-  //
-  // It only uses the browser's built-in
-  // speechSynthesis API.
   // ===================================================
 
   const previewVoice = () => {
 
     if (
-      typeof window ===
-      "undefined"
-    ) {
-      return;
-    }
-
-    if (
+      typeof window === "undefined" ||
       !window.speechSynthesis
     ) {
-
-      setError(
-        "Voice preview is not supported by this browser."
-      );
-
       return;
-
     }
 
     window.speechSynthesis.cancel();
 
     const text =
       language === "Hindi"
-        ? "नमस्ते! आज हम कुछ बहुत दिलचस्प जानने वाले हैं।"
+        ? "नमस्ते! आप कैसे हैं? आज हम कुछ बहुत दिलचस्प जानने वाले हैं।"
         : language === "Hinglish"
-          ? "Hi! Aaj hum kuch bahut interesting jaanne wale hain."
-          : "Hi! Today we're going to discover something really interesting.";
+          ? "Hi! How are you? Aaj hum kuch bahut interesting jaanne wale hain."
+          : "Hi! How are you? Today we're going to discover something really interesting.";
 
     const utterance =
-      new SpeechSynthesisUtterance(
-        text
-      );
+      new SpeechSynthesisUtterance(text);
 
     utterance.rate = 0.95;
-
-    utterance.pitch = 1;
-
-    /*
-     * We intentionally do NOT call Gemini here.
-     *
-     * The selected Gemini voice name is not necessarily
-     * available in browser speech synthesis.
-     *
-     * Browser chooses a local/default voice.
-     */
-
-    const browserVoices =
-      window.speechSynthesis.getVoices();
-
-    if (
-      browserVoices.length > 0
-    ) {
-
-      const preferred =
-        browserVoices.find(
-          (item) => {
-
-            if (
-              language === "Hindi"
-            ) {
-
-              return item.lang
-                .toLowerCase()
-                .startsWith("hi");
-
-            }
-
-            return item.lang
-              .toLowerCase()
-              .startsWith("en");
-
-          }
-        );
-
-      if (preferred) {
-        utterance.voice =
-          preferred;
-      }
-
-    }
 
     window.speechSynthesis.speak(
       utterance
@@ -766,8 +485,7 @@ export default function Home() {
   ) => {
 
     const currentResult =
-      generatedResult ||
-      result;
+      generatedResult || result;
 
     if (!currentResult) {
 
@@ -776,7 +494,6 @@ export default function Home() {
       );
 
       return;
-
     }
 
     if (!geminiKey) {
@@ -788,15 +505,9 @@ export default function Home() {
       );
 
       return;
-
-    }
-
-    if (generatingVoice) {
-      return;
     }
 
     setGeneratingVoice(true);
-
     setError("");
 
     try {
@@ -809,20 +520,7 @@ export default function Home() {
           language
         );
 
-      if (
-        !audio ||
-        audio.length === 0
-      ) {
-
-        throw new Error(
-          "Gemini returned empty audio."
-        );
-
-      }
-
-      setAudioData(
-        audio
-      );
+      setAudioData(audio);
 
       if (audioUrl) {
 
@@ -846,10 +544,7 @@ export default function Home() {
 
     } catch (err: any) {
 
-      console.error(
-        "Voice generation failed:",
-        err
-      );
+      console.error(err);
 
       setError(
         err?.message ||
@@ -858,9 +553,7 @@ export default function Home() {
 
     } finally {
 
-      setGeneratingVoice(
-        false
-      );
+      setGeneratingVoice(false);
 
     }
 
@@ -884,22 +577,15 @@ export default function Home() {
       );
 
       return;
-
-    }
-
-    if (searchingVideos) {
-      return;
     }
 
     setSearchingVideos(true);
-
     setError("");
 
     try {
 
       const found:
-        (PexelsVideo | null)[] =
-        [];
+        (PexelsVideo | null)[] = [];
 
       for (
         const scene of generated.scenes
@@ -922,22 +608,15 @@ export default function Home() {
             query
           );
 
-        found.push(
-          video
-        );
+        found.push(video);
 
       }
 
-      setVideos(
-        found
-      );
+      setVideos(found);
 
     } catch (err: any) {
 
-      console.error(
-        "Pexels search failed:",
-        err
-      );
+      console.error(err);
 
       setError(
         err?.message ||
@@ -946,9 +625,7 @@ export default function Home() {
 
     } finally {
 
-      setSearchingVideos(
-        false
-      );
+      setSearchingVideos(false);
 
     }
 
@@ -961,10 +638,6 @@ export default function Home() {
 
   const handleGenerate = async () => {
 
-    if (generating) {
-      return;
-    }
-
     setError("");
 
     if (!topic.trim()) {
@@ -974,7 +647,6 @@ export default function Home() {
       );
 
       return;
-
     }
 
     if (!geminiKey) {
@@ -986,7 +658,6 @@ export default function Home() {
       );
 
       return;
-
     }
 
     if (!pexelsKey) {
@@ -998,17 +669,12 @@ export default function Home() {
       );
 
       return;
-
     }
 
-    setGenerating(
-      true
-    );
+    setGenerating(true);
 
     setResult(null);
-
     setVideos([]);
-
     setAudioData(null);
 
     if (audioUrl) {
@@ -1031,13 +697,7 @@ export default function Home() {
 
     setFinalVideoUrl(null);
 
-    setRenderProgress(0);
-
     try {
-
-      // ===============================================
-      // SCRIPT
-      // ===============================================
 
       const generated =
         await generateShort(
@@ -1048,23 +708,14 @@ export default function Home() {
           voice
         );
 
-      setResult(
-        generated
-      );
+      setResult(generated);
 
 
-      // ===============================================
+      // -----------------------------------------------
       // VOICE
-      //
-      // This is the ONLY point where Gemini TTS
-      // is requested automatically.
-      //
-      // Browser preview never reaches here.
-      // ===============================================
+      // -----------------------------------------------
 
-      setGeneratingVoice(
-        true
-      );
+      setGeneratingVoice(true);
 
       const audio =
         await generateVoice(
@@ -1074,20 +725,7 @@ export default function Home() {
           language
         );
 
-      if (
-        !audio ||
-        audio.length === 0
-      ) {
-
-        throw new Error(
-          "Voice generation returned empty audio."
-        );
-
-      }
-
-      setAudioData(
-        audio
-      );
+      setAudioData(audio);
 
       const audioBlob =
         bytesToBlob(
@@ -1101,14 +739,12 @@ export default function Home() {
         )
       );
 
-      setGeneratingVoice(
-        false
-      );
+      setGeneratingVoice(false);
 
 
-      // ===============================================
+      // -----------------------------------------------
       // VIDEOS
-      // ===============================================
+      // -----------------------------------------------
 
       await findVideos(
         generated
@@ -1116,10 +752,7 @@ export default function Home() {
 
     } catch (err: any) {
 
-      console.error(
-        "Short generation failed:",
-        err
-      );
+      console.error(err);
 
       setError(
         err?.message ||
@@ -1128,13 +761,8 @@ export default function Home() {
 
     } finally {
 
-      setGenerating(
-        false
-      );
-
-      setGeneratingVoice(
-        false
-      );
+      setGenerating(false);
+      setGeneratingVoice(false);
 
     }
 
@@ -1147,10 +775,6 @@ export default function Home() {
 
   const createFinalVideo = async () => {
 
-    if (rendering) {
-      return;
-    }
-
     if (!result) {
 
       setError(
@@ -1158,7 +782,6 @@ export default function Home() {
       );
 
       return;
-
     }
 
     if (!audioData) {
@@ -1168,7 +791,6 @@ export default function Home() {
       );
 
       return;
-
     }
 
     if (
@@ -1182,7 +804,6 @@ export default function Home() {
       );
 
       return;
-
     }
 
     if (
@@ -1197,17 +818,10 @@ export default function Home() {
       );
 
       return;
-
     }
 
-    setRendering(
-      true
-    );
-
-    setRenderProgress(
-      0
-    );
-
+    setRendering(true);
+    setRenderProgress(0);
     setError("");
 
     try {
@@ -1235,17 +849,6 @@ export default function Home() {
 
         });
 
-      if (
-        !output ||
-        output.size === 0
-      ) {
-
-        throw new Error(
-          "Renderer returned an empty video."
-        );
-
-      }
-
       if (finalVideoUrl) {
 
         URL.revokeObjectURL(
@@ -1254,13 +857,10 @@ export default function Home() {
 
       }
 
-      const url =
+      setFinalVideoUrl(
         URL.createObjectURL(
           output
-        );
-
-      setFinalVideoUrl(
-        url
+        )
       );
 
       setRenderProgress(
@@ -1269,10 +869,7 @@ export default function Home() {
 
     } catch (err: any) {
 
-      console.error(
-        "Final video rendering failed:",
-        err
-      );
+      console.error(err);
 
       setError(
         err?.message ||
@@ -1281,70 +878,9 @@ export default function Home() {
 
     } finally {
 
-      setRendering(
-        false
-      );
+      setRendering(false);
 
     }
-
-  };
-
-
-  // ===================================================
-  // SEND SUGGESTION
-  //
-  // Uses mailto only.
-  //
-  // No backend.
-  // No webhook.
-  // No API key.
-  // No user information is automatically attached.
-  // ===================================================
-
-  const sendSuggestion = () => {
-
-    const clean =
-      suggestion.trim();
-
-    if (!clean) {
-      return;
-    }
-
-    const subject =
-      encodeURIComponent(
-        "AI Shorts - Suggestion"
-      );
-
-    const body =
-      encodeURIComponent(
-        `Hi Arpit,
-
-I have a suggestion for AI Shorts:
-
-${clean}
-
-Thanks!`
-      );
-
-    const mailto =
-      `mailto:markit1303@gmail.com?subject=${subject}&body=${body}`;
-
-    window.location.href =
-      mailto;
-
-    setSuggestionSent(
-      true
-    );
-
-    setSuggestion("");
-
-    window.setTimeout(() => {
-
-      setSuggestionSent(
-        false
-      );
-
-    }, 5000);
 
   };
 
@@ -1355,7 +891,25 @@ Thanks!`
 
   return (
 
-    <main className="min-h-screen overflow-hidden bg-[#07070a] text-white">
+    <main
+      className="min-h-screen overflow-hidden bg-[#07070a] text-white"
+      itemScope
+      itemType="https://schema.org/WebApplication"
+    >
+
+      {/* =================================================
+          SEO STRUCTURED DATA
+      ================================================= */}
+
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{
+          __html:
+            JSON.stringify(
+              structuredData
+            ),
+        }}
+      />
 
 
       {/* =================================================
@@ -1456,29 +1010,44 @@ Thanks!`
 
             <span className="h-1.5 w-1.5 rounded-full bg-emerald-400 shadow-[0_0_8px_rgba(52,211,153,.8)]" />
 
-            AI VIDEO CREATION
+            FREE AI VIDEO CREATION
 
           </div>
 
 
-          <h1 className="text-4xl font-bold tracking-[-0.04em] sm:text-6xl lg:text-7xl">
+          {/* =================================================
+              SEO PRIMARY HEADING
+          ================================================= */}
 
-            Turn an idea into a
+          <h1
+            className="text-4xl font-bold tracking-[-0.04em] sm:text-6xl lg:text-7xl"
+            itemProp="name"
+          >
+
+            Free AI Video Generator for
 
             <span className="block bg-gradient-to-r from-white via-gray-200 to-gray-500 bg-clip-text text-transparent">
 
-              finished Short.
+              YouTube Shorts & Reels
 
             </span>
 
           </h1>
 
 
-          <p className="mx-auto mt-6 max-w-xl text-sm leading-6 text-gray-500 sm:text-base">
+          {/* =================================================
+              SEO HERO DESCRIPTION
+          ================================================= */}
 
-            Generate your script, narration,
-            stock footage and final 9:16 video
-            without leaving your browser.
+          <p
+            className="mx-auto mt-6 max-w-xl text-sm leading-6 text-gray-500 sm:text-base"
+            itemProp="description"
+          >
+
+            Create short-form videos with our free AI video
+            generator. Generate an AI script, voiceover, stock
+            footage and a finished 9:16 video for YouTube Shorts,
+            Instagram Reels and TikTok — directly in your browser.
 
           </p>
 
@@ -1488,25 +1057,33 @@ Thanks!`
           <div className="mx-auto mt-9 flex max-w-lg items-center justify-center gap-2 text-[10px] text-gray-600 sm:gap-3 sm:text-xs">
 
             <span className="rounded-full border border-white/10 bg-white/[0.025] px-3 py-1.5">
+
               Script
+
             </span>
 
             <span>→</span>
 
             <span className="rounded-full border border-white/10 bg-white/[0.025] px-3 py-1.5">
+
               Voice
+
             </span>
 
             <span>→</span>
 
             <span className="rounded-full border border-white/10 bg-white/[0.025] px-3 py-1.5">
+
               Footage
+
             </span>
 
             <span>→</span>
 
             <span className="rounded-full border border-white/10 bg-white/[0.025] px-3 py-1.5">
+
               MP4
+
             </span>
 
           </div>
@@ -1603,7 +1180,6 @@ Thanks!`
 
               <div className="mt-5 grid gap-3 sm:grid-cols-2">
 
-
                 <div>
 
                   <label className="mb-2 block text-[11px] text-gray-500">
@@ -1634,7 +1210,9 @@ Thanks!`
                           value={item}
                           className="bg-[#111114]"
                         >
+
                           {item}
+
                         </option>
 
                       )
@@ -1675,7 +1253,9 @@ Thanks!`
                           value={item}
                           className="bg-[#111114]"
                         >
+
                           {item}
+
                         </option>
 
                       )
@@ -1699,99 +1279,39 @@ Thanks!`
                 </label>
 
 
-                <div
-                  ref={voiceMenuRef}
-                  className="relative"
-                >
+                <div className="flex gap-2">
 
-                  <button
-                    type="button"
-                    onClick={() =>
-                      setVoiceMenuOpen(
-                        (value) =>
-                          !value
+                  <select
+
+                    value={voice}
+
+                    onChange={(e) =>
+                      setVoice(
+                        e.target.value
                       )
                     }
-                    className="flex w-full items-center justify-between rounded-xl border border-white/10 bg-black/20 px-3.5 py-3 text-sm text-gray-200 outline-none transition hover:border-white/20"
+
+                    className="min-w-0 flex-1 appearance-none rounded-xl border border-white/10 bg-black/20 px-3.5 py-3 text-sm text-gray-200 outline-none focus:border-white/20"
+
                   >
 
-                    <span>
-                      {voice}
-                    </span>
+                    {voices.map(
+                      (item) => (
 
-                    <ChevronIcon
-                      open={
-                        voiceMenuOpen
-                      }
-                    />
+                        <option
+                          key={item}
+                          value={item}
+                          className="bg-[#111114]"
+                        >
 
-                  </button>
+                          {item}
 
+                        </option>
 
-                  {voiceMenuOpen && (
+                      )
+                    )}
 
-                    <div className="absolute left-0 right-0 top-[calc(100%+6px)] z-50 overflow-hidden rounded-xl border border-white/10 bg-[#111114] shadow-2xl shadow-black/50">
-
-                      <div className="max-h-60 overflow-y-auto p-1.5">
-
-                        {voices.map(
-                          (item) => (
-
-                            <button
-                              key={item}
-                              type="button"
-                              onClick={() => {
-
-                                setVoice(
-                                  item
-                                );
-
-                                setVoiceMenuOpen(
-                                  false
-                                );
-
-                              }}
-                              className={`flex w-full items-center justify-between rounded-lg px-3 py-2.5 text-left text-sm transition ${
-                                voice ===
-                                item
-                                  ? "bg-white/[0.09] text-white"
-                                  : "text-gray-400 hover:bg-white/[0.05] hover:text-white"
-                              }`}
-                            >
-
-                              <span>
-                                {item}
-                              </span>
-
-                              {voice ===
-                                item && (
-
-                                <CheckIcon />
-
-                              )}
-
-                            </button>
-
-                          )
-                        )}
-
-                      </div>
-
-                    </div>
-
-                  )}
-
-                </div>
-
-
-                <div className="mt-2 flex items-center justify-between gap-2">
-
-                  <p className="text-[10px] text-gray-700">
-
-                    Preview uses your browser.
-                    It does not call Gemini.
-
-                  </p>
+                  </select>
 
 
                   <button
@@ -1802,7 +1322,7 @@ Thanks!`
                       previewVoice
                     }
 
-                    className="flex shrink-0 items-center gap-2 rounded-lg border border-white/10 bg-white/[0.035] px-3 py-2 text-[10px] text-gray-400 transition hover:border-white/20 hover:bg-white/[0.07] hover:text-white"
+                    className="flex shrink-0 items-center gap-2 rounded-xl border border-white/10 bg-white/[0.035] px-4 text-xs text-gray-300 transition hover:border-white/20 hover:bg-white/[0.07] hover:text-white"
 
                   >
 
@@ -1813,6 +1333,14 @@ Thanks!`
                   </button>
 
                 </div>
+
+
+                <p className="mt-2 text-[10px] text-gray-700">
+
+                  Preview uses your browser.
+                  Final narration uses Gemini.
+
+                </p>
 
               </div>
 
@@ -1833,7 +1361,7 @@ Thanks!`
 
                     <p className="mt-1 text-[10px] text-gray-600">
 
-                      Your keys stay on your device.
+                      Keys stay on this device.
 
                     </p>
 
@@ -2009,40 +1537,18 @@ Thanks!`
 
             <div className="rounded-2xl border border-white/[0.08] bg-white/[0.025] p-5">
 
-              <div className="flex items-start justify-between gap-4">
+              <h3 className="text-xl font-semibold leading-7">
 
-                <h3 className="text-xl font-semibold leading-7">
+                {result.title}
 
-                  {result.title}
-
-                </h3>
-
-                <CopyButton
-                  value={
-                    result.title
-                  }
-                  label="Copy"
-                />
-
-              </div>
+              </h3>
 
 
               <div className="mt-5 rounded-xl border border-yellow-400/10 bg-yellow-400/[0.035] p-4">
 
-                <div className="mb-2 flex items-center justify-between gap-3">
+                <div className="mb-2 flex items-center gap-2 text-[10px] uppercase tracking-wider text-yellow-500">
 
-                  <div className="flex items-center gap-2 text-[10px] uppercase tracking-wider text-yellow-500">
-
-                    🎣 Hook / About
-
-                  </div>
-
-                  <CopyButton
-                    value={
-                      result.hook
-                    }
-                    label="Copy"
-                  />
+                  🎣 Hook
 
                 </div>
 
@@ -2061,7 +1567,7 @@ Thanks!`
 
             <div className="rounded-2xl border border-white/[0.08] bg-white/[0.025] p-5">
 
-              <div className="mb-4 flex items-center justify-between gap-3">
+              <div className="mb-4 flex items-center justify-between">
 
                 <div>
 
@@ -2079,23 +1585,11 @@ Thanks!`
 
                 </div>
 
+                <span className="rounded-lg bg-white/[0.04] px-2 py-1 text-[10px] text-gray-600">
 
-                <div className="flex items-center gap-2">
+                  {voice}
 
-                  <CopyButton
-                    value={
-                      result.voiceover
-                    }
-                    label="Copy"
-                  />
-
-                  <span className="rounded-lg bg-white/[0.04] px-2 py-1 text-[10px] text-gray-600">
-
-                    {voice}
-
-                  </span>
-
-                </div>
+                </span>
 
               </div>
 
@@ -2124,7 +1618,6 @@ Thanks!`
                       className="h-10 w-full"
 
                     />
-
 
                     <a
 
@@ -2173,7 +1666,6 @@ Thanks!`
                     )}
 
                   </button>
-
                 )}
 
               </div>
@@ -2303,29 +1795,17 @@ Thanks!`
             </div>
 
 
-            {/* =================================================
-                CAPTION / TAGS
-            ================================================= */}
+            {/* CAPTION / TAGS */}
 
             <div className="grid gap-5 sm:grid-cols-2">
 
               <div className="rounded-2xl border border-white/[0.08] bg-white/[0.025] p-5">
 
-                <div className="flex items-center justify-between gap-3">
+                <p className="text-[10px] uppercase tracking-wider text-gray-600">
 
-                  <p className="text-[10px] uppercase tracking-wider text-gray-600">
+                  Caption
 
-                    Caption
-
-                  </p>
-
-                  <CopyButton
-                    value={
-                      result.caption
-                    }
-                  />
-
-                </div>
+                </p>
 
                 <p className="mt-3 text-xs leading-6 text-gray-500">
 
@@ -2346,9 +1826,7 @@ Thanks!`
 
                 <p className="mt-3 text-xs leading-6 text-gray-500">
 
-                  {result.hashtags.join(
-                    " "
-                  )}
+                  {result.hashtags.join(" ")}
 
                 </p>
 
@@ -2746,120 +2224,105 @@ Thanks!`
 
             )}
 
-
-            {/* =================================================
-                SUGGESTIONS
-            ================================================= */}
-
-            <div className="rounded-2xl border border-white/[0.08] bg-white/[0.025] p-5">
-
-              <div className="flex items-start gap-4">
-
-                <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-violet-400/10 text-violet-300">
-
-                  <SparklesIcon />
-
-                </div>
-
-                <div>
-
-                  <p className="text-sm font-medium">
-
-                    Have a suggestion?
-
-                  </p>
-
-                  <p className="mt-1 text-xs leading-5 text-gray-600">
-
-                    Found something that could
-                    make AI Shorts better?
-                    Send me your idea.
-
-                  </p>
-
-                </div>
-
-              </div>
-
-
-              <textarea
-
-                value={
-                  suggestion
-                }
-
-                onChange={(e) =>
-                  setSuggestion(
-                    e.target.value
-                  )
-                }
-
-                maxLength={1000}
-
-                rows={4}
-
-                placeholder="Tell me what you'd like to improve..."
-
-                className="mt-5 w-full resize-none rounded-xl border border-white/10 bg-black/20 px-3.5 py-3 text-xs leading-5 text-white outline-none transition placeholder:text-gray-700 focus:border-violet-400/30"
-
-              />
-
-
-              <div className="mt-2 flex items-center justify-between">
-
-                <span className="text-[9px] text-gray-700">
-
-                  {suggestion.length}/1000
-
-                </span>
-
-                <span className="text-[9px] text-gray-700">
-
-                  Opens your email app
-
-                </span>
-
-              </div>
-
-
-              <button
-
-                type="button"
-
-                onClick={
-                  sendSuggestion
-                }
-
-                disabled={
-                  !suggestion.trim()
-                }
-
-                className="mt-4 flex w-full items-center justify-center gap-2 rounded-xl border border-white/10 bg-white/[0.04] px-4 py-3 text-xs font-medium text-gray-300 transition hover:border-white/20 hover:bg-white/[0.08] hover:text-white disabled:cursor-not-allowed disabled:opacity-30"
-
-              >
-
-                <MailIcon />
-
-                {suggestionSent
-                  ? "Suggestion ready to send"
-                  : "Send suggestion"}
-
-              </button>
-
-
-              <p className="mt-3 text-center text-[9px] leading-4 text-gray-700">
-
-                Your suggestion is sent directly
-                through your email client.
-                AI Shorts does not store it.
-
-              </p>
-
-            </div>
-
           </div>
 
         )}
+
+      </section>
+
+
+      {/* =================================================
+          SEO CONTENT
+      ================================================= */}
+
+      <section
+        className="mx-auto mt-20 max-w-4xl px-4 pb-16 sm:px-6"
+        aria-labelledby="seo-heading"
+      >
+
+        <div className="rounded-3xl border border-white/[0.07] bg-white/[0.025] p-6 sm:p-8">
+
+          <h2
+            id="seo-heading"
+            className="text-xl font-semibold text-white"
+          >
+
+            Free AI Video Generator for Short-Form Content
+
+          </h2>
+
+
+          <p className="mt-4 text-sm leading-7 text-gray-500">
+
+            AI Shorts helps you turn an idea into a complete
+            short-form video. Enter a topic and generate a script,
+            AI narration, relevant stock footage and a vertical
+            video ready for platforms such as YouTube Shorts,
+            Instagram Reels and TikTok.
+
+          </p>
+
+
+          <h2 className="mt-8 text-lg font-semibold text-white">
+
+            How does the AI video generator work?
+
+          </h2>
+
+
+          <p className="mt-3 text-sm leading-7 text-gray-500">
+
+            Enter the topic you want to create a video about.
+            The application generates the short script and scene
+            breakdown, creates the narration, searches for suitable
+            stock footage and combines everything into a 9:16 video.
+
+          </p>
+
+
+          <h2 className="mt-8 text-lg font-semibold text-white">
+
+            What can you create with AI Shorts?
+
+          </h2>
+
+
+          <p className="mt-3 text-sm leading-7 text-gray-500">
+
+            You can create educational videos, documentary-style
+            Shorts, mysterious stories, news-style videos, cinematic
+            content, storytelling videos and other short-form content.
+
+          </p>
+
+
+          <div className="mt-8 grid gap-3 sm:grid-cols-2">
+
+            {[
+              "Free AI video generator",
+              "AI YouTube Shorts generator",
+              "AI Instagram Reels generator",
+              "AI voiceover generator",
+              "AI script generator",
+              "Automatic 9:16 video creation",
+            ].map(
+              (item) => (
+
+                <div
+                  key={item}
+                  className="rounded-xl border border-white/[0.06] bg-black/20 px-4 py-3 text-xs text-gray-500"
+                >
+
+                  {item}
+
+                </div>
+
+              )
+            )}
+
+          </div>
+
+        </div>
 
       </section>
 
@@ -2906,9 +2369,7 @@ Thanks!`
               e.currentTarget
             ) {
 
-              setShowSettings(
-                false
-              );
+              setShowSettings(false);
 
             }
 
@@ -2948,8 +2409,7 @@ Thanks!`
 
                     Connect your own API keys.
                     They are stored only in this
-                    browser and used from your
-                    device.
+                    browser.
 
                   </p>
 
@@ -2959,9 +2419,7 @@ Thanks!`
                 <button
 
                   onClick={() =>
-                    setShowSettings(
-                      false
-                    )
+                    setShowSettings(false)
                   }
 
                   className="text-xl text-gray-600 transition hover:text-white"
@@ -2980,31 +2438,6 @@ Thanks!`
             <div className="p-5 sm:p-6">
 
 
-              {/* SECURITY NOTICE */}
-
-              <div className="mb-5 rounded-xl border border-emerald-400/10 bg-emerald-400/[0.035] p-3.5">
-
-                <div className="flex gap-2.5">
-
-                  <span className="text-sm">
-                    🔒
-                  </span>
-
-                  <p className="text-[10px] leading-5 text-emerald-300/70">
-
-                    Your Gemini and Pexels API
-                    keys are stored in this
-                    browser's local storage.
-                    They are not intentionally
-                    sent to an AI Shorts backend.
-
-                  </p>
-
-                </div>
-
-              </div>
-
-
               {/* GEMINI */}
 
               <div>
@@ -3020,9 +2453,7 @@ Thanks!`
 
                   type="password"
 
-                  value={
-                    geminiKey
-                  }
+                  value={geminiKey}
 
                   onChange={(e) =>
                     setGeminiKey(
@@ -3033,10 +2464,6 @@ Thanks!`
                   placeholder="Paste your Gemini API key"
 
                   autoComplete="off"
-
-                  spellCheck={
-                    false
-                  }
 
                   className="mt-2 w-full rounded-xl border border-white/10 bg-black/20 px-3.5 py-3 text-xs text-white outline-none transition placeholder:text-gray-700 focus:border-violet-400/30"
 
@@ -3077,9 +2504,7 @@ Thanks!`
 
                   type="password"
 
-                  value={
-                    pexelsKey
-                  }
+                  value={pexelsKey}
 
                   onChange={(e) =>
                     setPexelsKey(
@@ -3090,10 +2515,6 @@ Thanks!`
                   placeholder="Paste your Pexels API key"
 
                   autoComplete="off"
-
-                  spellCheck={
-                    false
-                  }
 
                   className="mt-2 w-full rounded-xl border border-white/10 bg-black/20 px-3.5 py-3 text-xs text-white outline-none transition placeholder:text-gray-700 focus:border-violet-400/30"
 
@@ -3121,20 +2542,19 @@ Thanks!`
 
               {/* PRIVACY */}
 
-              <div className="mt-5 rounded-xl border border-white/[0.07] bg-white/[0.025] p-3.5">
+              <div className="mt-5 rounded-xl border border-emerald-400/10 bg-emerald-400/[0.035] p-3.5">
 
                 <div className="flex gap-2.5">
 
                   <span className="text-sm">
-                    🛡️
+                    🔒
                   </span>
 
-                  <p className="text-[10px] leading-5 text-gray-500">
+                  <p className="text-[10px] leading-5 text-emerald-300/70">
 
-                    AI Shorts does not ask for
-                    your Gemini or Pexels
-                    credentials. You control
-                    your own API keys and usage.
+                    Keys are stored in your
+                    browser's local storage and
+                    are used from your device.
 
                   </p>
 
